@@ -4,14 +4,15 @@ const socket = io();
 function sendMessage(){
     const text = document.getElementById("message_input").value;
     if(text){
-        socket.emit("sendMessage",{text});
+        socket.emit("sendMessage",{text, username});
         document.getElementById("message_input").value = '';
     }
 }
 
 // recieve message
-socket.on("receiveMessage",(messages)=>{
-    addMessage(messages);
+socket.on("receiveMessage",(message)=>{
+    
+    addMessage(`${message.username}: ${message.text}`);
 })
 
 

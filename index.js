@@ -1,26 +1,39 @@
 import express from 'express';
 import http from 'http';
 import { Server, Socket } from 'socket.io';
+import bodyParser from 'body-parser';
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const port = 3000;
-app.use(express.static('public'));
 
+let username = "";
+
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({extended:true}));
+
+// Routes
 app.get("/", (req, res) => {
-    res.render("./chat.ejs");
+    res.render("home.ejs");
 })
 
+app.post("/enter", (req,res)=>{
+    username = req.body.username;
+    res.render("chat.ejs", {username: username});
+})
+
+
+
 io.on("connection", (socket)=>{
-    console.log("A user connected.");
+    console.log(`${username} connected.`);
     socket.on("disconnect", ()=> {
-        console.log('user disconnected');
+        console.log(`${username} disconnected.`);
     })
     // send message
-    socket.on("sendMessage", ({text}) => {
-        
-        io.emit("receiveMessage", text);
+    socket.on("sendMessage", ({text, username}) => {
+        const message = {text, username};
+        io.emit("receiveMessage", message);
     })
 })
 
