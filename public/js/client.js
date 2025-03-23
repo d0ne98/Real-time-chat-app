@@ -1,7 +1,7 @@
 const socket = io();
 
 // join
- socket.emit("join");
+ socket.emit("join", username);
 
 // Load messages
 socket.on("messageHistory", (messages)=>{
