@@ -1,16 +1,9 @@
 <%- include("partials/header.ejs") %>
 <body id="home-body">
-    <form  id="home-form" action="/enter" method="post">
-        <input id="username-input" type="text" name="username" placeholder="Username" required autofocus>
-        <button id="button" type="submit">Enter</button>
+    <form  id="home-form"  method="get">
+        <button id="button" formaction="/register" type="submit">Register</button>
+        <button id="button" formaction="/login" type="submit">Login</button>
     </form>
 
-    <script>
-        document.getElementById("username-input").addEventListener("keypress",(e)=>{
-            if(e.key === 'Enter'){
-             document.getElementById("home-form").submit();
-            }
-        })
-    </script>
 </body>
 </html>

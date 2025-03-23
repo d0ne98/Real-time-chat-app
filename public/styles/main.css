@@ -128,14 +128,16 @@ body{
 
 /* home.ejs */
 
-#home-body{
+#home-body > form{
     display: flex;
+    height: 100vh;
     align-items: center;
     justify-content: center;
 }
 
 
-#username-input{
+
+#home-form > input{
     padding: 1.2rem 1.5rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -146,7 +148,7 @@ body{
     transition: all 0.2s ease;
 }
 
-#username-input:focus {
+#home-form > input:focus {
     outline: none;
     border-color: #6366f1;
     background: rgba(255, 255, 255, 0.1);

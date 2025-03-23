@@ -8,3 +8,7 @@ CREATE TABLE messages(
   message TEXT,
   user_id INTEGER REFERENCES users(id)
 );
+
+/* Add password column for authentication */
+ALTER TABLE users
+  ADD COLUMN password TEXT;

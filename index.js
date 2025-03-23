@@ -4,12 +4,14 @@ import { Server, Socket } from 'socket.io';
 import bodyParser from 'body-parser';
 import env from "dotenv";
 import pg from "pg";
+import  bcrypt from "bcrypt";
 
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const port = 3000;
+const saltRounds = 10;
 env.config();
 
 const db = new pg.Client({
@@ -31,19 +33,59 @@ app.get("/", (req, res) => {
     res.render("home.ejs");
 })
 
-app.post("/enter", async(req,res)=>{
-    const username = req.body.username;
-    try{
-    const result = await db.query("SELECT * FROM users WHERE username= $1", [username]);
-    if(result.rows.length > 0){
-        res.render("chat.ejs", {username: username});
-    } else{
-      await db.query("INSERT INTO users (username) VALUES ($1)",[username])
-      res.render("chat.ejs", {username: username});
+app.get("/register",(req,res)=>{
+    res.render("register.ejs");
+})
+
+app.get("/login",(req,res)=>{
+    res.render("login.ejs");
+})
+
+
+app.post("/register",async (req,res)=>{
+    const enteredUsername = req.body.username;
+    const enteredPassword = req.body.password;
+    try {
+        const user = await db.query("SELECT * FROM users WHERE username = $1",[enteredUsername]);
+        if(user.rows.length > 0){  // username already exists
+            res.render("login.ejs",{msg:"Username already exists. Login."});
+        }else{ // new username
+            bcrypt.hash(enteredPassword,saltRounds, async(err,hash)=>{
+                if(err){
+                    console.log("Error hashing.", err)
+                }else{
+                    const result = await db.query(
+                        "INSERT INTO users (username, password) VALUES ($1, $2)",
+                        [enteredUsername, hash]);
+                }
+                res.render("chat.ejs", {username:enteredUsername});
+            })
+        } 
+    } catch (err) {
+        console.log(err);
     }
-}catch(err){
-    console.log(err);
-}
+});
+
+app.post("/login", async (req, res)=>{
+    const enteredUsername = req.body.username;
+    const enteredPassword = req.body.password;
+    try {
+        const user = await db.query("SELECT * FROM users WHERE username = $1",[enteredUsername]);
+        if(user.rows.length > 0){
+            bcrypt.compare(enteredPassword, user.rows[0].password, (err, result)=>{
+                if(err){
+                    console.log("Error comparing,", err);
+                }else{
+                    if(result){
+                        res.render("chat.ejs",{username:enteredUsername});
+                    }else{
+                        res.render("login.ejs", {msg:"Incorrect Password"})
+                } }
+            })
+           }
+    } catch (err) {
+        console.log(err);
+    }
 })
 
 
