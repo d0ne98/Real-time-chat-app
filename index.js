@@ -9,7 +9,8 @@ const io = new Server(server);
 const port = 3000;
 
 let username = "";
-
+let roomNumber;
+let messages = [];
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:true}));
 
@@ -24,16 +25,20 @@ app.post("/enter", (req,res)=>{
 })
 
 
-
+// Socket.io Events
 io.on("connection", (socket)=>{
-    console.log(`${username} connected.`);
     socket.on("disconnect", ()=> {
-        console.log(`${username} disconnected.`);
+    })
+    // send message history
+    socket.on("join",(username)=>{
+        socket.emit("messageHistory", messages);
     })
     // send message
-    socket.on("sendMessage", ({text, username}) => {
-        const message = {text, username};
+    socket.on("sendMessage", ({username, text}) => {
+        const message = {username, text};
+        messages.push(message);
         io.emit("receiveMessage", message);
+        
     })
 })
 
