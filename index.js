@@ -30,15 +30,17 @@ io.on("connection", (socket)=>{
     socket.on("disconnect", ()=> {
     })
     // send message history
-    socket.on("join",(username)=>{
+    socket.on("join",()=>{
         socket.emit("messageHistory", messages);
     })
     // send message
     socket.on("sendMessage", ({username, text}) => {
+
         const message = {username, text};
         messages.push(message);
         io.emit("receiveMessage", message);
-        
+    
+          
     })
 })
 

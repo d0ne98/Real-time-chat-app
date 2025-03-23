@@ -1,36 +1,60 @@
 const socket = io();
 
 // join
- socket.emit("join",username);
+ socket.emit("join");
 
 // Load messages
 socket.on("messageHistory", (messages)=>{
     messages.forEach(msg => {
-        addMessage(`${msg.username}: ${msg.text}`) 
+        addMessage(`${msg.text}`, `${msg.username}`);
     });
     
 });
 
 //Send meassage
 function sendMessage(){
-    const text = document.getElementById("message_input").value;
+    const text = document.getElementById("message-input").value;
     if(text){
         socket.emit("sendMessage",{username, text});
-        document.getElementById("message_input").value = '';
+        document.getElementById("message-input").value = '';
+        
     }
 }
 
 // recieve message
 socket.on("receiveMessage",(message)=>{
     
-    addMessage(`${message.username}: ${message.text}`);
+    addMessage(`${message.text}`, `${message.username}`);
 });
 
 
 // show messagess
-function addMessage(text){
-    const messageBox = document.getElementById("message_box");
-    const messageDiv = document.createElement("div");
-    messageDiv.textContent = text;
-    messageBox.appendChild(messageDiv);
+function addMessage(text, msgUsername){
+    const messagesContainer = document.getElementById('messages');
+    const sendButton = document.getElementById('send-button');
+
+    const newMessage = document.createElement('div');
+       if(msgUsername === username){
+         newMessage.className = 'message sent';
+         newMessage.innerHTML = `
+                <div class="message-content">
+                    <p>${text}</p>
+                    <div class="message-meta">You</div>
+                </div>
+            `;
+       }else{
+        newMessage.className = 'message received';
+            newMessage.innerHTML = `
+                <div class="message-content">
+                    <p>${text}</p>
+                    <div class="message-meta">${msgUsername}</div>
+                </div>
+            `;
+       }
+    messagesContainer.appendChild(newMessage);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+
+document.getElementById("message-input").addEventListener("keypress",(e)=>{
+    if(e.key === "Enter") sendMessage();
+})

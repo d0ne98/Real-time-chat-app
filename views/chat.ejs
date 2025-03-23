@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-time chat app</title>
-</head>
+<%- include("partials/header.ejs") %>
 <body>
-    <div class="Chat_div">
-      <div id="message_box">
+    <div id="chat-container">
+      <div id="messages">
+          
       </div>
-      <input type="text" id="message_input" placeholder="Type here ....">
-      <button onclick="sendMessage()">Send</button>
-    </div>
+      <div id="input-container">
+          <input type="text" id="message-input" placeholder="Type your message...">
+          <button id="button" onclick="sendMessage()">Send</button>
+      </div>
+  </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/client.js"></script>

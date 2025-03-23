@@ -1,15 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
-</head>
-<body>
-    <form action="/enter" method="post">
-        <input type="text" name="username" placeholder="userName" required autofocus>
-        <button type="submit">Enter</button>
+<%- include("partials/header.ejs") %>
+<body id="home-body">
+    <form  id="home-form" action="/enter" method="post">
+        <input id="username-input" type="text" name="username" placeholder="Username" required autofocus>
+        <button id="button" type="submit">Enter</button>
     </form>
 
+    <script>
+        document.getElementById("username-input").addEventListener("keypress",(e)=>{
+            if(e.key === 'Enter'){
+             document.getElementById("home-form").submit();
+            }
+        })
+    </script>
 </body>
 </html>
