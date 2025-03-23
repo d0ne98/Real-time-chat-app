@@ -64,6 +64,7 @@ io.on("connection", (socket)=>{
            messages.push({username, message});
         })
         socket.emit("messageHistory", messages);
+        
     })
     // send message
     socket.on("sendMessage", async({username, text}) => {

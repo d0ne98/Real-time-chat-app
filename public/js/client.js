@@ -6,7 +6,7 @@ const socket = io();
 // Load messages
 socket.on("messageHistory", (messages)=>{
     messages.forEach(msg => {
-        addMessage(`${msg.text}`, `${msg.username}`);
+        addMessage(`${msg.message}`, `${msg.username}`);
     });
     
 });
