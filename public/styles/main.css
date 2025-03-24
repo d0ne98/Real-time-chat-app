@@ -111,6 +111,88 @@ body{
     box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
 
+/* three-dot menu */
+
+.message-options {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.message:hover .message-options {
+    opacity: 1;
+}
+
+.options-menu {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: #1e293b;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex-direction: column;
+    min-width: 180px;
+    z-index: 100;
+    overflow: hidden;
+}
+.options-menu.show {
+    display: flex;
+}
+
+.option-item {
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.option-item:hover {
+    background: #334155;
+}
+.option-item:hover {
+    background: #334155;
+}
+
+.option-item i {
+    font-size: 1.1rem;
+}
+
+.option-item.danger {
+    color: #dc2626;
+}
+
+.option-item.success {
+    color: #a35ce2;
+}
+.message-content > .option-item.success{
+    background: linear-gradient(135deg, #223cc5 0%, #a31676 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
+            margin-top: 10px;
+}
+
+.edit-input {
+    background: rgba(33 25 42 / 48%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    color: #ffffff;
+    width: 100%;
+}
+
+
 /* Responsive styles */
 @media (max-width: 768px) {
     #chat-container {
@@ -121,6 +203,15 @@ body{
     
     #message-input {
         padding: 1rem;
+    }
+
+    #home-body > form{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
     }
 }
 

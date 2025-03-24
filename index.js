@@ -103,7 +103,8 @@ io.on("connection", (socket)=>{
         messagesDb.rows.forEach(msg =>{
            const username =  usernamesDb.rows.find(user => user.id === msg.user_id).username;
            const message = msg.message;
-           messages.push({username, message});
+           const id = msg.id;
+           messages.push({username, message, id});
         })
         socket.emit("messageHistory", messages);
         
@@ -111,10 +112,30 @@ io.on("connection", (socket)=>{
     // send message
     socket.on("sendMessage", async({username, text}) => {
         const user = await db.query("SELECT id FROM users WHERE username = $1",[username]);
-        await db.query("INSERT INTO messages (message, user_id) VALUES ($1, $2)",[text, user.rows[0].id]);
-        const message = {username, text};
+        const newMessage = await db.query("INSERT INTO messages (message, user_id) VALUES ($1, $2) RETURNING *",[text, user.rows[0].id]);
+        const id = newMessage.rows[0].id;
+        const message = {username, text, id};
         io.emit("receiveMessage", message);
           
+    })
+
+    //delete message
+    socket.on("deleteMessage", async(messageId)=>{
+        try {
+            await db.query("DELETE FROM messages WHERE id= $1",[messageId]);
+        } catch (err) {
+            console.log(err);
+        }
+    })
+
+    // edit message
+    socket.on("editMessage", async (msg)=>{
+        try {
+            await db.query("UPDATE messages SET message = $1 WHERE id=$2",[msg.newValue, msg.id]);
+        } catch (err) {
+            console.log(err);
+        }
+        
     })
 })
 
