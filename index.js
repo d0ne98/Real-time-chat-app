@@ -82,6 +82,8 @@ app.post("/login", async (req, res)=>{
                         res.render("login.ejs", {msg:"Incorrect Password"})
                 } }
             })
+           }else{
+            res.render("register.ejs",{msg:"Username doesn't exists. Register."});
            }
     } catch (err) {
         console.log(err);
