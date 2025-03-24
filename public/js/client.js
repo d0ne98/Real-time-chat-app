@@ -99,8 +99,18 @@ function deleteMessage(element) {
 }
 
 
+let priviousMessage = null;
+
 function editMessage(element) {
     const message = element.closest('.message');
+    
+    // remove existing edit window if exists
+    if(priviousMessage) {
+        priviousMessage.querySelector('.message-content').removeChild(activeEdit);
+        priviousMessage.querySelector('.message-content').removeChild(activeEditButton);
+        priviousMessage = null;  
+    }
+    priviousMessage = message;
 
     /*
     // Restrict editing to sent messages only
@@ -113,13 +123,18 @@ function editMessage(element) {
             const originalText = content.textContent;
             const id = message.id;
             const editInput = document.createElement('input');
+            activeEdit = editInput;
             editInput.type = 'text';
             editInput.className = 'edit-input';
             editInput.value = originalText;
             const saveButton = document.createElement('button');
+            activeEditButton = saveButton;
             saveButton.textContent = 'Save';
             saveButton.className = 'option-item success';
             saveButton.style.marginTop = '0.5rem';
+            message.querySelector('.message-content').appendChild(editInput);
+            message.querySelector('.message-content').appendChild(saveButton);
+            editInput.focus();
             saveButton.onclick = () => {
                 const newValue = editInput.value;
                 // send edited message to server
@@ -128,11 +143,8 @@ function editMessage(element) {
                 content.textContent = newValue;
                 message.querySelector('.message-content').removeChild(editInput);
                 message.querySelector('.message-content').removeChild(saveButton);
+                priviousMessage = null;
             };
-
-            message.querySelector('.message-content').appendChild(editInput);
-            message.querySelector('.message-content').appendChild(saveButton);
-            editInput.focus();
         }
 
         // close menu if users click somewhere else
