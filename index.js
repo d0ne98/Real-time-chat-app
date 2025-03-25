@@ -5,6 +5,9 @@ import bodyParser from 'body-parser';
 import env from "dotenv";
 import pg from "pg";
 import  bcrypt from "bcrypt";
+import passport from 'passport';
+import { Strategy } from 'passport-local';
+import session from 'express-session';
 
 
 const app = express();
@@ -24,9 +27,20 @@ const db = new pg.Client({
 
 db.connect();
 
-
+// middlewares
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie:{
+        maxAge: 1000 * 60 * 60 * 6  // 6 hours
+    }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 // Routes
 app.get("/", (req, res) => {
@@ -40,6 +54,20 @@ app.get("/register",(req,res)=>{
 app.get("/login",(req,res)=>{
     res.render("login.ejs");
 })
+
+app.get("/chat",(req,res)=>{
+    if(req.isAuthenticated()){
+        const username = req.user.username;
+        res.render("chat.ejs",{username});
+    }else{
+        res.redirect("/login");
+    }
+})
+
+app.post("/login",passport.authenticate("local",{
+    successRedirect:"/chat",
+    failureRedirect:"/login"
+}));
 
 
 app.post("/register",async (req,res)=>{
@@ -55,10 +83,18 @@ app.post("/register",async (req,res)=>{
                     console.log("Error hashing.", err)
                 }else{
                     const result = await db.query(
-                        "INSERT INTO users (username, password) VALUES ($1, $2)",
+                        "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
                         [enteredUsername, hash]);
                 }
-                res.render("chat.ejs", {username:enteredUsername});
+                const user = result.rows[0];
+                req.login(user,(err)=>{
+                 if(err) {
+                    console.log(err)
+                } else{
+                    res.redirect("/chat");
+                }
+                })
+                
             })
         } 
     } catch (err) {
@@ -66,6 +102,43 @@ app.post("/register",async (req,res)=>{
     }
 });
 
+passport.use("local",
+    new Strategy(async function verify(username, password, cb) {
+        try {
+            const user = await db.query("SELECT * FROM users WHERE username = $1",[username]);
+            if(user.rows.length > 0){
+                bcrypt.compare(password, user.rows[0].password, (err, result)=>{
+                    if(err){
+                        // error with password check
+                        console.log("Error comparing,", err);
+                        return cb(err)
+                    }else{
+                        if(result){
+                            //Passed password check
+                            return cb(null, user.rows[0]);
+                        }else{
+                            //Did not pass password check
+                            return cb(null, false);
+                    } }
+                })
+               }else{
+                return cb("User not found");
+               }
+        } catch (err) {
+            console.log(err);
+        }
+    })
+);
+
+passport.serializeUser((user, cb) => {
+    cb(null, user);
+  });
+
+  passport.deserializeUser((user, cb) => {
+    cb(null, user);
+  });
+
+/* used passport instead
 app.post("/login", async (req, res)=>{
     const enteredUsername = req.body.username;
     const enteredPassword = req.body.password;
@@ -90,6 +163,7 @@ app.post("/login", async (req, res)=>{
     }
 })
 
+*/
 
 // Socket.io Events
 io.on("connection", (socket)=>{
@@ -141,6 +215,6 @@ io.on("connection", (socket)=>{
     })
 })
 
-server.listen(port, () =>{
+server.listen(port,'0.0.0.0', () =>{
     console.log(`Server is running on port ${port}`);
 } )
