@@ -85,7 +85,7 @@ app.post("/register",async (req,res)=>{
                     const result = await db.query(
                         "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
                         [enteredUsername, hash]);
-                }
+                
                 const user = result.rows[0];
                 req.login(user,(err)=>{
                  if(err) {
@@ -94,7 +94,7 @@ app.post("/register",async (req,res)=>{
                     res.redirect("/chat");
                 }
                 })
-                
+                }
             })
         } 
     } catch (err) {
@@ -122,7 +122,7 @@ passport.use("local",
                     } }
                 })
                }else{
-                return cb("User not found");
+                return cb(null, false);
                }
         } catch (err) {
             console.log(err);
