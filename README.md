@@ -19,7 +19,7 @@ A real-time chat application built with Node.js, Express, and Socket.io. Users c
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/d0ne98/Real-time-chat-app.git
    cd Real-time-chat-app
    ```
 
